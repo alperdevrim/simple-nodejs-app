@@ -52,19 +52,3 @@ docker build -t jenkins-practice:latest .
 docker run -p 3000:3000 jenkins-practice:latest
 ```
 
-## Jenkins Pipeline
-
-The project includes a Jenkinsfile that defines a basic CI/CD pipeline with the following stages:
-1. Install Dependencies
-2. Lint
-3. Test
-4. Build
-5. Docker Build
-
-## Getting Started with Jenkins
-
-1. Make sure you have Jenkins installed and running
-2. Create a new pipeline project in Jenkins
-3. Configure the pipeline to use the Jenkinsfile from this repository
-4. Make sure Docker is installed and configured in your Jenkins environment
-5. Run the pipeline to see the CI/CD process in action 
