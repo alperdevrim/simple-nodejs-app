@@ -38,18 +38,10 @@ pipeline {
         stage('Security Scan') {
             steps {
                 script {
-                    // Install Trivy if not already installed
-                    sh '''
-                        if ! command -v trivy &> /dev/null; then
-                            echo "Installing Trivy..."
-                            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-                        fi
-                    '''
-                    
-                    // Run Trivy scan on the Docker image
+                    // Run Trivy scan using Docker
                     sh '''
                         echo "Running Trivy scan on ${DOCKER_IMAGE}:${DOCKER_TAG}..."
-                        trivy image --severity ${TRIVY_SEVERITY} --exit-code 1 ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker run --rm aquasec/trivy:latest image --severity ${TRIVY_SEVERITY} --exit-code 1 ${DOCKER_IMAGE}:${DOCKER_TAG}
                     '''
                 }
             }
