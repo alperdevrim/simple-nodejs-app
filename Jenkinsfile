@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'todo-app'
         DOCKER_TAG = 'latest'
-        MONGODB_URI = 'mongodb://mongodb:27017/todo-app'
     }
 
     stages {
@@ -35,15 +34,20 @@ pipeline {
             }
         }
 
-        stage('Test with MongoDB') {
+        stage('Test Application') {
             steps {
                 script {
-                    // Start MongoDB and the application
-                    sh 'docker-compose up -d mongodb'
-                    sh 'sleep 10' // Wait for MongoDB to be ready
+                    // Start the application
                     sh 'docker-compose up -d app'
-                    sh 'sleep 5' // Wait for the app to be ready
-
+                    
+                    // Wait for the application to be ready
+                    sh '''
+                        until curl -s http://localhost:3000/health > /dev/null; do
+                            echo "Waiting for application to be ready..."
+                            sleep 5
+                        done
+                    '''
+                    
                     // Test the application
                     sh '''
                         curl -f http://localhost:3000/health || exit 1
