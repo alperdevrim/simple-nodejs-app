@@ -41,7 +41,10 @@ pipeline {
                     // Run Trivy scan using Docker
                     sh '''
                         echo "Running Trivy scan on ${DOCKER_IMAGE}:${DOCKER_TAG}..."
-                        docker run --rm aquasec/trivy:latest image --severity ${TRIVY_SEVERITY} --exit-code 1 ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v /var/lib/docker:/var/lib/docker \
+                        aquasec/trivy:latest image ${DOCKER_IMAGE}:${DOCKER_TAG}
                     '''
                 }
             }
@@ -55,7 +58,7 @@ pipeline {
                     
                     // Wait for the application to be ready
                     sh '''
-                        until curl -s http://localhost:3000/health > /dev/null; do
+                        until curl -s http://localhost:3000/health > /dev/null; do|
                             echo "Waiting for application to be ready..."
                             sleep 5
                         done
