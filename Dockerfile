@@ -1,4 +1,7 @@
-FROM node:18-alpine
+FROM alpine:latest
+
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
 
 WORKDIR /app
 
@@ -10,5 +13,4 @@ COPY . .
 
 EXPOSE 3000
 
-# Wait for MongoDB to be ready
-CMD ["sh", "-c", "npm start"] 
+CMD ["npm", "start"] 

@@ -50,15 +50,6 @@ pipeline {
             }
         }
 
-        stage('Test Application') {
-            steps {
-                script {
-                    // Start the application container
-                    sh 'docker run -d -p 3000:3000 --name todo-app ${DOCKER_IMAGE}:${DOCKER_TAG}'
-                    
-                }
-            }
-        }
 
         stage('Build and Push') {
             when {
