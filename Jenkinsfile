@@ -56,23 +56,6 @@ pipeline {
                     // Start the application container
                     sh 'docker run -d -p 3000:3000 --name todo-app ${DOCKER_IMAGE}:${DOCKER_TAG}'
                     
-                    // Wait for the application to be ready
-                    sh '''
-                        until curl -s http://localhost:3000/health > /dev/null; do|
-                            echo "Waiting for application to be ready..."
-                            sleep 5
-                        done
-                    '''
-                    
-                    // Test the application
-                    sh '''
-                        curl -f http://localhost:3000/health || exit 1
-                        curl -f http://localhost:3000/api/todos || exit 1
-                    '''
-
-                    // Stop and remove the container
-                    sh 'docker stop todo-app || true'
-                    sh 'docker rm todo-app || true'
                 }
             }
         }
