@@ -28,8 +28,8 @@ pipeline {
         stage('Build Docker') {
             steps {
                 script {
-                    // Build the application image
-                    sh 'docker-compose build app'
+                    // Build the Docker image
+                    sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
                 }
             }
         }
@@ -37,8 +37,8 @@ pipeline {
         stage('Test Application') {
             steps {
                 script {
-                    // Start the application
-                    sh 'docker-compose up -d app'
+                    // Start the application container
+                    sh 'docker run -d -p 3000:3000 --name todo-app ${DOCKER_IMAGE}:${DOCKER_TAG}'
                     
                     // Wait for the application to be ready
                     sh '''
@@ -54,8 +54,9 @@ pipeline {
                         curl -f http://localhost:3000/api/todos || exit 1
                     '''
 
-                    // Stop the containers
-                    sh 'docker-compose down'
+                    // Stop and remove the container
+                    sh 'docker stop todo-app || true'
+                    sh 'docker rm todo-app || true'
                 }
             }
         }
@@ -66,7 +67,7 @@ pipeline {
             }
             steps {
                 script {
-                    // Tag and push the image
+                    // Tag the image with build number
                     sh 'docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     // Note: You would need to configure Docker registry credentials
                     // sh 'docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}'
@@ -77,7 +78,9 @@ pipeline {
 
     post {
         always {
-            sh 'docker-compose down || true'
+            // Clean up any leftover containers
+            sh 'docker stop todo-app || true'
+            sh 'docker rm todo-app || true'
             cleanWs()
         }
         success {
